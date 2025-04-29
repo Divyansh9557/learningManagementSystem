@@ -1,18 +1,20 @@
 
-import LogoutButton from "@/components/logoutButton";
-import auth from "@/lib/checkAuth";
-import { redirect } from "next/navigation";
+
+import Hero from "@/components/home/Hero";
+
+
 
 
 export default async function Home() {
 
-     const user = await auth()
-     if(!user?.id){ 
-      redirect("/login")
-     }
+    //  const user = await auth()
+    //  if(!user?.id){ 
+    //   redirect("/login")
+    //  }
      return (
    <>
-   <LogoutButton/>
+
+   <Hero/>
    </>
   );
 }

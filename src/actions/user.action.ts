@@ -5,6 +5,8 @@ import genertateToken from "@/lib/generateToken";
 import User from "@/models/User";
 import bcrypt from "bcrypt"
 import { redirect } from "next/navigation";
+import jwt from "jsonwebtoken";
+import { cookies } from "next/headers";
 
 
 
@@ -52,6 +54,7 @@ export const RegisterUserAction = async (data: registerType) => {
 
 export const LoginUser= async(data:loginType)=>{
   const {email,password}= data
+  await connectDB()
    try {
       const user= await User.findOne({email})
       if(!user){
@@ -71,3 +74,19 @@ export const LoginUser= async(data:loginType)=>{
    }
    redirect('/')
 }
+
+
+
+export const authUser =async()=>{
+    const cookieStore = cookies();
+    const data=(await cookieStore).get("token")
+    const token = data?.value
+const user = token ? jwt.verify(token, process.env.JWT_SECRET as string) : null;
+if (user && typeof user !== "string") {
+    return { id: user.id, role: user.role };
+}
+return null;
+     
+} 
+
+

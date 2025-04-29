@@ -73,7 +73,7 @@ export  function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input {...register("password")} id="password" type="password" required />
+                <Input {...register("password")} id="password" name="password" type="password" required />
               </div>
               <Button type="submit" className="w-full" variant="form"> 
                {isSubmitting?"Loading...":"Login"}
