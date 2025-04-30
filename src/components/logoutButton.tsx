@@ -1,4 +1,5 @@
 "use client";
+import { redirect } from "next/navigation";
 // import { redirect } from "next/navigation";
 import { Button } from "./ui/button"
 
@@ -12,12 +13,12 @@ const LogoutButton = () => {
       const data= await res.json()
       if(data.message==="Logout Success"){
         toast.success("Logout Success")
-        // redirect("/login")
+        redirect("/")
       }
    } 
    
   return (
-    <Button variant='outline'  onClick={handleLogout} >LogOut</Button>
+    <Button variant='form'  onClick={handleLogout} >LogOut</Button>
   )
 }
 

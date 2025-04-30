@@ -9,11 +9,17 @@ export async function GET() {
     if(!token){
         return NextResponse.json({message:"token not found"})
     }
-    const user = jwt.verify(token, process.env.JWT_SECRET as string);
+    try {
+        const user = jwt.verify(token, process.env.JWT_SECRET as string);
+        if (typeof user === "object" && user !== null && "id" in user && "role" in user) {
+            return NextResponse.json({ id: user.id, role: user.role });
+        }
+    } catch (error) {
+        if(error instanceof Error){
 
-    if (typeof user === "object" && user !== null && "id" in user && "role" in user) {
-        return NextResponse.json({ id: user.id, role: user.role });
+            return NextResponse.json({ message: error.message });
+        }
     }
 
-    return NextResponse.json({ message: "Invalid token payload" });
+
 }

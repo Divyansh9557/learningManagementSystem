@@ -20,7 +20,7 @@ const Hero = () => {
             Search
           </button>
         </form>
-        <button className="mt-6 px-6 py-2 bg-blue-600 rounded hover:bg-blue-700">
+        <button className="mt-6 px-6 py-2 rounded-2xl bg-blue-600  hover:bg-blue-700">
           Explore Courses
         </button>
       </div>

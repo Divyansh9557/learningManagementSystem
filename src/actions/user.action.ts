@@ -90,3 +90,42 @@ return null;
 } 
 
 
+
+export const getUser = async ()=>{
+    const cookieStore = await cookies();
+    const token= cookieStore.get("token")?.value
+    
+    try {
+       if (!token) {
+           throw new Error("Token is missing");
+       }
+       const decodedToken = jwt.verify(token, process.env.JWT_SECRET as string);
+       await connectDB()
+       
+       if (typeof decodedToken !== "object" || !("id" in decodedToken)) {
+           throw new Error("Invalid token");
+       }
+      const user = await User.findById(decodedToken.id).select("-password");
+      if(!user ){
+         throw new Error("user not found")
+      }
+      
+      const dbUser = {
+         _id:user._id.toString(),
+         image:user.image.toString(),
+         username: user.username.toString(),
+         email: user.email.toString(),
+         role: user.role.toString(),
+         enrolledCourses:user.enrolledCourses,
+         createdAt: user.createdAt.toString(),
+         updatedAt: user.updatedAt.toString(),
+      }
+      return dbUser
+    } catch (error) {
+      if(error instanceof Error) {
+         return {error:error.message}
+      }
+
+    }
+} 
+
