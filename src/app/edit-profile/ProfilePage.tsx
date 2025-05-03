@@ -1,6 +1,6 @@
 'use client'
 
-import { getUser } from '@/actions/user.action'
+import { getUser, updateUserName } from '@/actions/user.action'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Course from '@/components/home/Course'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -8,36 +8,47 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { UploadImage } from '@/lib/UploadImage'
 import { User } from '@/models/User'
 import { Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 
 
 export const ProfilePage = () => {
     const [updateUserIsLoading,setUpdateUserIsLoading]= useState(false)
     const [name, setName] = useState("");
-    const [profileImage,setProfileImage]= useState('')
     const [user,setUser]= useState<User>()
     const course=[1,2,3,4,5]
-    const handleImage= (e:any)=>{
-       const file = e.target.files?.[0]
-       if(file) setProfileImage(file)
-    }
+     
+  
 
     useEffect(()=>{
        const getUserData= async()=>{
           const data:any= await getUser()
-          setUser(data)
+          setUser(data as User) // cast the object to match the User type
        }
        getUserData()
     },[])
   
-    const handleSubmit= ()=>{
-         setUpdateUserIsLoading(true)
-          console.log(name)
-          console.log(profileImage)
-          setUpdateUserIsLoading(false)
+    const handleSubmit= async()=>{
+      setUpdateUserIsLoading(true);
+
+      try {
+        const updatedUser = await updateUserName(name); 
+        if ('error' in updatedUser && typeof updatedUser.error === 'string') {
+          throw new Error(updatedUser.error);
+        }
+        setUser(updatedUser as unknown as User || user ); 
+      } catch (error) {
+        if(error instanceof Error){
+          setName("")
+          toast.error(error.message)
+        }
+      } finally {
+        setUpdateUserIsLoading(false);
+      }
     }
   return (
     <div className="max-w-4xl mx-auto px-4 my-10">
@@ -45,7 +56,7 @@ export const ProfilePage = () => {
     <div className="flex flex-col md:flex-row items-center md:items-start gap-8 my-5">
       <div className="flex flex-col items-center">
         <Avatar className="h-24 w-24 md:h-32 md:w-32 mb-4">
-          <AvatarImage src={"https://github.com/shadcn.png"} alt="@shadcn" />
+          <AvatarImage src={ user?.image || "https://github.com/shadcn.png"} alt={user?.username} />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
       </div>
@@ -77,6 +88,7 @@ export const ProfilePage = () => {
             <Button size="sm" className="mt-2 bg-black text-white ">
               Edit Profile
             </Button>
+           
           </DialogTrigger>
           <DialogContent className="bg-slate-700 text-white">
             <DialogHeader>
@@ -98,13 +110,7 @@ export const ProfilePage = () => {
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label>Profile Photo</Label>
-                <Input
-                  onChange={() => handleImage}
-                  type="file"
-                  accept="image/*"
-                  className="col-span-3"
-                />
+                
               </div>
             </div>
             <DialogFooter>
@@ -121,6 +127,7 @@ export const ProfilePage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        <UploadImage setUser={setUser} />
       </div>
     </div>
     <div>

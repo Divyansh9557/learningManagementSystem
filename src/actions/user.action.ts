@@ -7,6 +7,7 @@ import bcrypt from "bcrypt"
 import { redirect } from "next/navigation";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import auth from "@/lib/checkAuth";
 
 
 
@@ -64,7 +65,7 @@ export const LoginUser= async(data:loginType)=>{
       if(!isMatch){
          throw new Error("incorrect password")
       }
-      await genertateToken(user._id.toString(), user.role)
+      await genertateToken(user._id.toString(), user.role,user.image)
      return {success:true}
 
    } catch (error) {
@@ -129,3 +130,30 @@ export const getUser = async ()=>{
     }
 } 
 
+
+export const updateUserName = async (username: string) => {
+   const authResult = await auth();
+   if (!authResult) {
+       throw new Error("Authentication failed");
+   }
+  try {
+    const { id } = authResult;
+    await connectDB()
+    await User.findByIdAndUpdate(id,{username:username}).select("-password -publicId ")
+    const user = await User.findById(id).select("-password -publicId ");
+    const dbUser = {
+       _id:user._id.toString(),
+       image:user.image.toString(),
+       username: user.username.toString(),
+       email: user.email.toString(),
+       role: user.role.toString(),
+       enrolledCourses:user.enrolledCourses,
+       createdAt: user.createdAt.toString(),
+       updatedAt: user.updatedAt.toString(),
+      }
+      return dbUser
+  } catch (error) {
+   if(error instanceof Error) {}
+       return {error:"username already taken"}
+  }
+}

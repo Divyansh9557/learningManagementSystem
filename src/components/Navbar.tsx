@@ -23,6 +23,7 @@ import { usePathname } from "next/navigation";
 type userType={
     id:string,
     role:string
+    image:string
   }
 
   const Navbar = () => {
@@ -75,7 +76,7 @@ type userType={
               <DropdownMenuTrigger asChild>
                 <Avatar className="hover:scale-105" >
                   <AvatarImage
-                    src="https://github.com/shadcn.png"
+                    src={ user?.image ||"https://github.com/shadcn.png"}
                     alt="@shadcn"
                   />
                   <AvatarFallback>CN</AvatarFallback>

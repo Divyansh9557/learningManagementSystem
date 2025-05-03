@@ -6,18 +6,18 @@ import {Schema, Document } from "mongoose";
 export interface User extends Document {
     username: string,
     email: string,
-    password: string,
+    password?: string,
     role:string,
     enrolledCourses: mongoose.Schema.Types.ObjectId[],
     image: string,
     _id:string,
+    publicId?:string
 }
 
 const userSchema:Schema<User>= new mongoose.Schema({
    username: {
     type: String,
     required: true,
-    unique: true,
    },
     email: {
      type: String,
@@ -40,6 +40,10 @@ const userSchema:Schema<User>= new mongoose.Schema({
         type: String,
         default:""
     },
+    publicId:{
+        type:String,
+        default:""
+    }
 }, {
   timestamps: true,
 })
