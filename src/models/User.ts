@@ -11,7 +11,8 @@ export interface User extends Document {
     enrolledCourses: mongoose.Schema.Types.ObjectId[],
     image: string,
     _id:string,
-    publicId?:string
+    publicId?:string,
+    resourceType?: string,
 }
 
 const userSchema:Schema<User>= new mongoose.Schema({
@@ -43,7 +44,8 @@ const userSchema:Schema<User>= new mongoose.Schema({
     publicId:{
         type:String,
         default:""
-    }
+    },
+    resourceType: {type:String,}
 }, {
   timestamps: true,
 })

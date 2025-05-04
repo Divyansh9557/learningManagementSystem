@@ -3,12 +3,12 @@
 import { getUser, updateUserName } from '@/actions/user.action'
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Course from '@/components/home/Course'
+import {ImageUploader} from '@/components/imageUploader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { UploadImage } from '@/lib/UploadImage'
 import { User } from '@/models/User'
 import { Loader2 } from 'lucide-react'
 import React, { useEffect, useState } from 'react'
@@ -83,6 +83,7 @@ export const ProfilePage = () => {
             <span className="font-normal text-gray-700  ml-2">{user?.role.toUpperCase()}</span>
           </h1>
         </div>
+            <ImageUploader/>
         <Dialog>
           <DialogTrigger asChild>
             <Button size="sm" className="mt-2 bg-black text-white ">
@@ -127,7 +128,7 @@ export const ProfilePage = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
-        <UploadImage setUser={setUser} />
+       
       </div>
     </div>
     <div>
