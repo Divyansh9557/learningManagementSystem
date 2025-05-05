@@ -5,7 +5,7 @@ export interface ICourse extends Document {
     description: string;
     subtitle: string;
     isPublished: boolean;
-    enrolledStudents: mongoose.Types.ObjectId[]; // Array of references to User model
+    enrolledStudents: string[];
     createdAt: Date;
     updatedAt: Date;
     creator:string;
@@ -14,25 +14,29 @@ export interface ICourse extends Document {
     price:number;
     thumbnail: string;
     courseLevel:string;
+    publicId: string;
+    resourceType: string;
 }
 
 const CourseSchema: Schema<ICourse> = new Schema(
     {
         title: { type: String, required: true },
-        description: { type: String, required: true },
+        description: { type: String },
         courseLevel:{type:String,enum:['Beginner','Intermediate','Advanced']},
-        subtitle: { type: String, required: true },
+        subtitle: { type: String},
         enrolledStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         isPublished: { type: Boolean, default: false },
         creator: { type: String, required: true },
-        lecture: [{ type: mongoose.Schema.Types.ObjectId, ref:"Lecture" ,required: true }],
+        lecture: [{ type: mongoose.Schema.Types.ObjectId, ref:"Lecture"  }],
         category: { type: String, required: true },
-        price: { type: Number, required: true },
-        thumbnail:{type:String,required:true},
+        price: { type: Number, },
+        thumbnail:{type:String},
+        publicId: { type: String },
+        resourceType:{type:String}
 
     },
     {
-        timestamps: true, // Automatically adds createdAt and updatedAt fields
+        timestamps: true,
     }
 );
 

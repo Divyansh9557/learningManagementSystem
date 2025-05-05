@@ -1,6 +1,6 @@
 import auth from '@/lib/checkAuth';
 import connectDB from '@/lib/connectDB';
-import UserModel from '@/models/User';
+import Course from '@/models/Course';
 import { v2 as cloudinary } from 'cloudinary';
 import { NextResponse,NextRequest } from 'next/server';
 
@@ -11,13 +11,16 @@ cloudinary.config({
 });
 
 export async function POST(request:NextRequest) {
+    await connectDB()
     const userId = await auth()
     if(!userId?.id){
         return NextResponse.json({ error: 'Not authorized' }, { status: 401 });
     }
   const formData = await request.formData();
   const file = formData.get('file');
-await connectDB()
+  const courseID = formData.get('id') ;
+  console.log(courseID)
+
   if (!file) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
   }
@@ -49,7 +52,7 @@ await connectDB()
   });
 
 
-  const user = await UserModel.findById(userId?.id);
+  const user = await Course.findById(courseID);
 
 
   if (user?.publicId) {
@@ -66,6 +69,6 @@ await connectDB()
   }
 
 
-   await UserModel.findByIdAndUpdate(userId?.id, { image: url ,publicId:public_id,resourceType:resourceType },{new:true});
+   await Course.findByIdAndUpdate(courseID, { thumbnail: url ,publicId:public_id,resourceType:resourceType },{new:true});
   return   NextResponse.json({ success:true})
 }

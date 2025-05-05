@@ -9,9 +9,9 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { User } from '@/models/User'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2 } from 'lucide-react'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
 
@@ -19,28 +19,29 @@ import toast from 'react-hot-toast'
 export const ProfilePage = () => {
     const [updateUserIsLoading,setUpdateUserIsLoading]= useState(false)
     const [name, setName] = useState("");
-    const [user,setUser]= useState<User>()
     const course=[1,2,3,4,5]
-     
-  
+    const queryClient= useQueryClient()
+
 
     useEffect(()=>{
-       const getUserData= async()=>{
-          const data:any= await getUser()
-          setUser(data as User) // cast the object to match the User type
-       }
-       getUserData()
-    },[])
+        
+    })
+    
+     const {data:user} =  useQuery({
+        queryKey:['profileUser'],
+        queryFn: async()=>{
+            const data:any= await getUser()
+            return data
+        }
+       })
+
   
     const handleSubmit= async()=>{
       setUpdateUserIsLoading(true);
 
       try {
-        const updatedUser = await updateUserName(name); 
-        if ('error' in updatedUser && typeof updatedUser.error === 'string') {
-          throw new Error(updatedUser.error);
-        }
-        setUser(updatedUser as unknown as User || user ); 
+        await updateUserName(name); 
+        queryClient.invalidateQueries({ queryKey: ["profileUser"] });
       } catch (error) {
         if(error instanceof Error){
           setName("")

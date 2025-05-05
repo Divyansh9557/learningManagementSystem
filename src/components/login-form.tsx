@@ -10,14 +10,14 @@ import { LoginUser } from "@/actions/user.action"
 import { useForm ,SubmitHandler} from "react-hook-form"
 import toast from "react-hot-toast"
 import { redirect } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query";
 
 
 export  function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-
-
+  const queryClient = useQueryClient()
   const {register,formState:{isSubmitting},handleSubmit} = useForm({
     defaultValues: {
       email: "",
@@ -34,6 +34,7 @@ export  function LoginForm({
      const res= await LoginUser(data);
      if(res?.success){
       toast.success("Login successful")
+      await queryClient.invalidateQueries({ queryKey: ["authUser"] });
       redirect("/")
      }
      else{
@@ -54,18 +55,19 @@ export  function LoginForm({
                 </p>
               </div>
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
+                <Label className="text-white" htmlFor="email">Email</Label>
                 <Input
                   type="email"
                   id="email"
                   placeholder="m@example.com"
                   required
+                  className="text-white border-white"
                   {...register("email", {})}
                 />
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
+                  <Label className="text-white" htmlFor="password">Password</Label>
                   <a
                     href="#"
                     className="ml-auto text-sm underline-offset-2 hover:underline text-white "
@@ -73,7 +75,7 @@ export  function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input {...register("password")} id="password" name="password" type="password" required />
+                <Input {...register("password")}  className="text-white border-white" id="password" name="password" type="password" required />
               </div>
               <Button type="submit" className="w-full" variant="form"> 
                {isSubmitting?"Loading...":"Login"}

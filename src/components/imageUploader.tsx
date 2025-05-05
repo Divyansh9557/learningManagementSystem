@@ -3,10 +3,12 @@
 
 import { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useQueryClient } from "@tanstack/react-query";
 
 export  function ImageUploader() {
   const [file, setFile] = useState<File | null>(null);
   const [isUploading,setIsuploading]= useState(false)
+  const queryClient = useQueryClient();
 
   const handleUpload = async () => {
     const formData = new FormData();
@@ -25,6 +27,8 @@ export  function ImageUploader() {
 
     const data = await res.json();
     if (data.success) {
+       await queryClient.invalidateQueries({ queryKey: ["authUser"] });
+       await queryClient.invalidateQueries({ queryKey: ["profileUser"] });
       toast.success("image uploaded")
       
     } else {

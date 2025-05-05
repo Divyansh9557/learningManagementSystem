@@ -51,7 +51,10 @@ export function SignUp({
     <div className={cn("flex flex-col gap-6  ", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2 ">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-6 md:p-8 bg-black ">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="p-6 md:p-8 bg-black "
+          >
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
                 <h1 className="text-2xl font-bold text-white ">New with us</h1>
@@ -60,38 +63,51 @@ export function SignUp({
                 </p>
               </div>
               <div className="grid gap-3">
-                <Label htmlFor="email">Username</Label>
-                <Input {...register("username")}
+                <Label className="text-white" htmlFor="email">
+                  Username
+                </Label>
+                <Input
+                  {...register("username")}
                   id="username"
                   type="text"
                   placeholder="john_doe"
-                 
+                  className="text-white border-white"
                 />
               </div>
-              {errors.username && <p className="text-red-500">{errors.username.message}</p>}
+              {errors.username && (
+                <p className="text-red-500">{errors.username.message}</p>
+              )}
               <div className="grid gap-3">
-                <Label htmlFor="email">Email</Label>
-                <Input {...register("email")}
+                <Label className="text-white" htmlFor="email">Email</Label>
+                <Input
+                  {...register("email")}
                   id="email"
                   type="email"
+                   className="text-white border-white"
                   placeholder="m@example.com"
-                  
                 />
-                {errors.email && <p className="text-red-500">{errors.email.message}</p>}
+                {errors.email && (
+                  <p className="text-red-500">{errors.email.message}</p>
+                )}
               </div>
               <div className="grid gap-3">
                 <div className="flex items-center">
-                  <Label htmlFor="password">Password</Label>
-                
+                  <Label className="text-white" htmlFor="password">Password</Label>
                 </div>
-                <Input {...register("password")} id="password" type="password"  />
+                <Input
+                  {...register("password")}
+                  id="password"
+                  type="password"
+                   className="text-white border-white"
+                />
               </div>
-              {errors.password && <p className="text-red-500">{errors.password.message}</p>}
-              <Button type="submit" className="w-full" variant="form"> 
-                {isSubmitting?"Loading...":"Register"}
+              {errors.password && (
+                <p className="text-red-500">{errors.password.message}</p>
+              )}
+              <Button type="submit" className="w-full" variant="form">
+                {isSubmitting ? "Loading..." : "Register"}
               </Button>
-              
-             
+
               <div className="text-center text-white text-sm">
                 Already have an account?{" "}
                 <Link href="/login" className="underline underline-offset-4">
@@ -116,5 +132,5 @@ export function SignUp({
         and <a href="#">Privacy Policy</a>.
       </div>
     </div>
-  )
+  );
 }
