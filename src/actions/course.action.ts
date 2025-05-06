@@ -1,7 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 import auth from "@/lib/checkAuth"
 import connectDB from "@/lib/connectDB";
+import deleteOnCloudinary from "@/lib/deleteOnCloudinary";
+import uploadOnClodinary from "@/lib/uploadOnCloudinary";
 import Course from "@/models/Course";
+import Lecture from "@/models/lecture";
 
 export const createCourse= async(formData:FormData)=>{
     const title = formData.get('title') as string
@@ -98,3 +102,94 @@ export const getCourseBYId= async(id:string)=>{
      }
 
 }
+
+export const createLecture= async (title:string,courseId:string)=>{
+      if(!title) throw new Error("title is required")
+       await connectDB()
+      try {
+        const course = await Course.findById(courseId);
+        if(!course){
+          throw new Error("couse is invaild")
+        }
+        const lecture = await Lecture.create({lectureTitle:title})
+         if(!lecture){
+          throw new Error("failed to create lecture")
+         }
+
+         const courseLecture = await Course.findByIdAndUpdate(courseId,{lecture:[...course.lecture,lecture._id]})
+         if(!courseLecture){
+          throw new Error("failed to update course")
+         }
+         return {success:true}
+
+
+      } catch (error) {
+        if(error instanceof Error){
+          return {error:true}
+        }
+      }
+}
+
+export const getLecture = async (id:string)=>{
+  try {
+    await connectDB();
+
+    const course = await Course.findById(id)
+      .populate("lecture")
+      .lean() as ({ _id: string; lecture: any[] } | null);
+
+    if (!course) {
+      throw new Error("Course not found");
+    }
+
+    const plainLectures = (course.lecture || []).map((lec: any) => ({
+      _id: lec._id.toString(),
+      lectureTitle: lec.lectureTitle,
+      createdAt: lec.createdAt,
+      updatedAt: lec.updatedAt,
+    }));
+
+    return {
+      _id: course._id.toString(),
+      lecture: plainLectures,
+    };
+
+  } catch (error) {
+    if(error instanceof Error){
+
+      return {error:true,message:error.message}
+    }
+  }
+}
+
+export const updateLecture= async (formData:FormData)=>{
+   const title= formData.get("title") as string
+   const video= formData.get("video") as File
+   const isFree= formData.get("isFree") as string
+   const lectureId= formData.get("lectureId") as string
+try {
+  const {public_id,url,resourceType}= await uploadOnClodinary(video)
+  
+     const free= isFree==='true'?true:false
+     
+     const lecture = await Lecture.findById(lectureId)
+     if(lecture.publicId){
+         await deleteOnCloudinary(lecture.publicId,lecture.resourceType)
+     }
+
+     await Lecture.findByIdAndUpdate(lectureId,{
+       lectureTitle:title,
+        videoUrl: url,
+        publicId: public_id,
+        resourceType,
+        isPriviewFree:free
+     },{new:true})
+  return true;
+
+
+} catch (error) {
+   console.log(error)
+}
+   
+
+}  

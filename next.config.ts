@@ -2,10 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["images.unsplash.com", "github.com"], // Add allowed domains here
+    domains: ["images.unsplash.com", "github.com"],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "50mb", // Adjust as needed
+    },
   },
 };
 
 export default nextConfig;
-
-

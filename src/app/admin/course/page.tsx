@@ -15,7 +15,9 @@ import { getCreatorPost } from "@/actions/course.action";
 import { FaRegEdit } from "react-icons/fa";
 
 const AdminCourse = async () => {
-  const data: any = await getCreatorPost();
+  const data: any = await getCreatorPost() || [] ;
+  
+  const courses = Array.isArray(data) ? data : [];
 
   return (
     <div className=" px-5 p-15 md:px-20 md:py-15 w-full">
@@ -33,7 +35,7 @@ const AdminCourse = async () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {data?.map((course: any) => (
+          {courses?.map((course: any) => (
             <TableRow key={course._id}>
               <TableCell className="font-medium">{course.title}</TableCell>
               <TableCell>{course.price ? `₹${course.price}` : "₹0"}</TableCell>
