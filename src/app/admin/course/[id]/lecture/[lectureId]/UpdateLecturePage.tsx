@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import Link from "next/link";
 import { ChangeEvent, useState } from "react";
-import { updateLecture } from "@/actions/course.action";
+import { removeLecture, updateLecture } from "@/actions/course.action";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
@@ -41,6 +41,9 @@ const UpdateLecturePage = () => {
       formData.append("isFree", isFree.toString())
       formData.append("lectureId", lectureId?.toString() || "")
      const data= await updateLecture(formData)
+     if (typeof data === "object" && data?.error) {
+       throw new Error(data.message)
+     }
      return data
     },
       onSuccess:()=>{
@@ -49,9 +52,27 @@ const UpdateLecturePage = () => {
       },
       onError:(error)=>{
         toast.error(error.message)
+        router.push(`/admin/course/${id}/lecture`)
       }
 
    })
+
+   const { isPending: isDeleting, mutate: handleDelete } = useMutation({
+     mutationFn: async () => {
+       const res = await removeLecture(lectureId as string);
+       if (res?.success) {
+         return res;
+       }
+       throw new Error(res?.message);
+     },
+     onSuccess: () => {
+       toast.success("Lecture Deleted Successfully");
+       router.push(`/admin/course/${id}/lecture`);
+     },
+     onError: (error) => {
+       toast.error(error.message);
+     },
+   });
 
  
    
@@ -76,8 +97,10 @@ const UpdateLecturePage = () => {
             <CardDescription className="ml-6">
               Save Changes and , save when done
             </CardDescription>
-            <Button className="bg-red-400 ml-6 text-white ">
-              Remove Lecture
+            <Button onClick={()=> handleDelete()} className="bg-red-400 ml-6 text-white ">
+             {
+              isDeleting?"Deleting...":"Remove Lecture"
+             }
             </Button>
             <div className="space-y-3">
               <Label>Title</Label>

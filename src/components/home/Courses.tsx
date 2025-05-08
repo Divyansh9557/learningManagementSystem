@@ -1,22 +1,32 @@
 'use client'
 
-import { useState } from 'react';
+
 import Course from './Course';
 import { CourseSkeleton } from '../ui/courseSkeleton';
+import { useQuery } from '@tanstack/react-query';
+import { ICourse } from '@/models/Course';
 
 
 
 const Courses = () => {
-    const [isLoading,setIsLoading]= useState(false)
-    const arr = [0,1,2,3,4,5,6,7]
+    const arr = [0,1,2,3]
+    const {data,isLoading}= useQuery({
+      queryKey:["courseHome"],
+      queryFn:async()=>{
+        const res= await fetch("/api/course/published")
+        const data= await res.json();
+        console.log(data.course)
+        return data.course
+      }
+    })
   return (
-    <div className='w-[90%]  min-h-60  mx-auto flex flex-col items-center pt-3 ' >
+    <div className=' w-[70%] md:w-[90%]  min-h-60  mx-auto mb-32 flex flex-col items-center pt-3 ' >
         
              <h1 className='text-3xl font-bold  ' > Our Courses</h1>
-             <div className='flex flex-wrap mt-8 justify-center gap-8 min-h-40' >
+             <div className=' grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-8 justify-center items-center gap-8 min-h-40' >
                 {
                     isLoading?  arr.map((curr,index)=><CourseSkeleton key={index} /> )
-                    : arr.map((curr,index)=><Course key={index} /> ) 
+                    : data?.map((curr:ICourse,index:number) =><Course curr={curr} key={curr?._id || index } /> ) 
                 }
              </div>
         

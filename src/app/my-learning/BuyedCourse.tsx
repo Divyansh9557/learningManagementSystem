@@ -6,9 +6,9 @@ import { CourseSkeleton } from "@/components/ui/courseSkeleton";
 import { useState } from "react";
 
 export const BuyedCourse = () => {
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const arr= [1,2,3]
-    const data=[2]
+    const data=[]
 
   return (
     <>

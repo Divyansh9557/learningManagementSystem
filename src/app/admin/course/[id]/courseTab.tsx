@@ -24,16 +24,21 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { getCourseBYId, UpdateCourse } from "@/actions/course.action";
+import { deletecourse, getCourseBYId, publishCourse, UpdateCourse } from "@/actions/course.action";
 import toast from "react-hot-toast";
+import { useMutation } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 const CourseTab = ({id}:{id:string}) => {
   const [image, setImage] = useState<string | null>(null);
   const [uploadImage, setUploadImage] = useState<File | null>(null);
   const [isLoading,setIsLoading]= useState(false)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [courseData,setCourseData]= useState()
   const [isImageLoading,setImageIsLoading]= useState(false)
   const [isPublished,setIsPublished]= useState(false)
+  const router = useRouter()
  
 
    useEffect(()=>{
@@ -49,7 +54,10 @@ const CourseTab = ({id}:{id:string}) => {
       getCourse()
    },[id])
 
-  console.log(courseData)
+  
+
+
+  
   const {
     register,
     handleSubmit,
@@ -115,8 +123,49 @@ const  handleImageUpload = async(e:any)=>{
    setImage(null)
 }
 
+
+const {mutate:handleDeleteCourse,isPending}= useMutation({
+    mutationFn:async(e:React.MouseEvent<HTMLButtonElement>)=>{
+      e.preventDefault()
+     
+       const res= await deletecourse(id)
+       return res
+    },
+    onSuccess:()=>{
+      toast.success("course deleted succesfully")
+    router.push("/admin/course")
+    }
+})
+
+const {mutate:handlePublishCourse,isPending:isPublishing}= useMutation({
+  mutationFn:async(e:React.MouseEvent<HTMLButtonElement>)=>{
+    e.preventDefault()
+    const res= await publishCourse(id)
+    if(res?.success){
+      return res
+    }
+    if(res?.error){
+      throw new Error(res.message)
+    }
+  },
+  onError:(err)=>{
+    toast.error(err.message);
+  },
+  onSuccess:()=>{
+    if(isPublished){
+
+      toast.success("course Unpublished succesfully")
+    }
+    else{
+
+      toast.success("course published succesfully")
+    }
+    setIsPublished(!isPublished)
+  }
+})
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+   
       <Card className="mx-5 mt-5">
         <CardHeader className="flex-col-reverse md:flex-row flex justify-between px-8">
           <div>
@@ -124,17 +173,39 @@ const  handleImageUpload = async(e:any)=>{
             <CardDescription>Make changes to your courses here</CardDescription>
           </div>
           <div className="flex gap-4">
-            <Button variant="outline">
-              {isPublished ? "Unpublish" : "Publish"}
+            <Button onClick={(e)=>handlePublishCourse(e)} variant="outline">
+              {isPublished ? "Unpublish" : isPublishing? "Publishing":"Publish"}
             </Button>
-            <Button className="bg-red-400 text-white">Remove Course</Button>
+
+          <Button className="bg-red-400 text-white" >
+          <Dialog >
+  <DialogTrigger  >Open</DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Are you absolutely sure?</DialogTitle>
+      <DialogDescription>
+        This action cannot be undone. This will permanently course your account
+        and remove your data from our servers.
+
+      </DialogDescription>
+      <Button onClick={(e)=>handleDeleteCourse(e)} className="bg-red-400 w-32  text-white">
+              {
+                isPending?"Deleting":"Remove Course"
+              }
+            </Button>
+    </DialogHeader>
+  </DialogContent>
+</Dialog>
+          </Button>
+           
           </div>
         </CardHeader>
+        <form onSubmit={handleSubmit(onSubmit)}>
         <CardContent>
           <div className="space-y-5 mt-5">
             <div className="space-y-2">
               <Label>Title</Label>
-              <Input {...register("title", { required: true })} placeholder="Enter the title for course" />
+              <Input {...register("title")} placeholder="Enter the title for course" />
             </div>
 
             <div className="space-y-2">
@@ -150,7 +221,7 @@ const  handleImageUpload = async(e:any)=>{
             <div className="gap-5 flex-col md:flex-row flex justify-around">
               <div className="space-y-2">
                 <Label>Category</Label>
-                <Select onValueChange={(value) => setValue("category", value)}>
+                <Select required onValueChange={(value) => setValue("category", value)}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -167,7 +238,7 @@ const  handleImageUpload = async(e:any)=>{
 
               <div className="space-y-2">
                 <Label>Course Level</Label>
-                <Select onValueChange={(value) => setValue("level", value)}>
+                <Select required onValueChange={(value) => setValue("level", value)}>
                   <SelectTrigger className="w-[180px]">
                     <SelectValue placeholder="Select a level" />
                   </SelectTrigger>
@@ -221,8 +292,8 @@ const  handleImageUpload = async(e:any)=>{
             </div>
           </div>
         </CardContent>
-      </Card>
     </form>
+      </Card>
   );
 };
 

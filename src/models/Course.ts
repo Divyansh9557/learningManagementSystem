@@ -1,6 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 export interface ICourse extends Document {
+    _id: string;
     title: string;
     description: string;
     subtitle: string;
@@ -8,7 +9,10 @@ export interface ICourse extends Document {
     enrolledStudents: string[];
     createdAt: Date;
     updatedAt: Date;
-    creator:string;
+    creator:{
+        image:string,
+        username:string,
+    };
     lecture:string[]
     category:string;
     price:number;
@@ -26,7 +30,7 @@ const CourseSchema: Schema<ICourse> = new Schema(
         subtitle: { type: String},
         enrolledStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
         isPublished: { type: Boolean, default: false },
-        creator: { type: String, required: true },
+        creator: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
         lecture: [{ type: mongoose.Schema.Types.ObjectId, ref:"Lecture"  }],
         category: { type: String, required: true },
         price: { type: Number, },

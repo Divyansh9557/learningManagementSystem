@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use server"
 import auth from "@/lib/checkAuth"
@@ -36,6 +37,7 @@ export const createCourse= async(formData:FormData)=>{
 export const getCreatorPost= async ()=>{
     const authUser = await auth()
     try {
+      await connectDB()
       if(!authUser){
         return
       }
@@ -51,18 +53,18 @@ export const UpdateCourse= async(formData:FormData)=>{
   try {
     await connectDB();
     const user= await auth()
-
-    const title = formData.get("title") as string;
-    const subtitle = formData.get("subtitle") as string;
-    const description = formData.get("description") as string;
-    const price = formData.get("price") as string;
-    const category = formData.get("category") as string;
-    const level = formData.get("level") as string
     const courseId = formData.get("id") as string;
+    const course = await Course.findById(courseId);
 
+    const title = formData.get("title") as string || course.title ;
+    const subtitle = formData.get("subtitle") as string || course.subtitle ;
+    const description = formData.get("description") as string || course.description ;
+    const price = formData.get("price") as string || course.price ;
+    const category = formData.get("category") as string || course.category ;
+    const level = formData.get("level") as string || course.courseLevel
 
      await Course.findByIdAndUpdate(courseId,{
-      title,
+      title ,
       subtitle,
       description,
       price,
@@ -101,6 +103,29 @@ export const getCourseBYId= async(id:string)=>{
        }
      }
 
+}
+
+export const deletecourse = async(id:string)=>{
+    try {
+      connectDB();
+      const course = await Course.findById(id).populate("lecture")
+      if(!course){
+        throw new Error("course not found")
+      }
+      if(course.lecture){
+        course.lecture.forEach(async(lec: { _id:string,publicId: string, resourceType:string}) => {
+           await deleteOnCloudinary(lec.publicId,lec.resourceType)
+           await Lecture.findByIdAndDelete(lec._id)
+         })
+      
+      }
+      await deleteOnCloudinary(course.publicId,course.resourceType)
+      await Course.findByIdAndDelete(id)
+       return true
+
+    } catch (error) {
+      
+    }
 }
 
 export const createLecture= async (title:string,courseId:string)=>{
@@ -168,28 +193,103 @@ export const updateLecture= async (formData:FormData)=>{
    const isFree= formData.get("isFree") as string
    const lectureId= formData.get("lectureId") as string
 try {
-  const {public_id,url,resourceType}= await uploadOnClodinary(video)
-  
-     const free= isFree==='true'?true:false
-     
-     const lecture = await Lecture.findById(lectureId)
+ await  connectDB()
+ 
+ const free= isFree==='true'?true:false
+ 
+ const lecture = await Lecture.findById(lectureId)
+ if(!lecture){
+   throw new Error("lecture not found")
+ }
+ const {public_id,url,resourceType}= await uploadOnClodinary(video)
      if(lecture.publicId){
          await deleteOnCloudinary(lecture.publicId,lecture.resourceType)
      }
 
      await Lecture.findByIdAndUpdate(lectureId,{
-       lectureTitle:title,
+       lectureTitle:title || lecture.lectureTitle,
         videoUrl: url,
         publicId: public_id,
         resourceType,
         isPriviewFree:free
-     },{new:true})
+     })
   return true;
 
 
 } catch (error) {
-   console.log(error)
+  if(error instanceof Error){
+    return {error:true,message:error.message}
+  }
 }
    
 
-}  
+} 
+
+export const removeLecture= async (id:string)=>{
+    try {
+      await connectDB()
+      const lecture = await Lecture.findById(id)
+      if(!lecture){
+        throw new Error(' Lecture not found')
+      }
+      if(lecture.publicId){
+        await deleteOnCloudinary(lecture.publicId,lecture.resourceType)
+      }
+      await Lecture.findByIdAndDelete(id)
+      return {success:true};
+    } catch (error) {
+      if(error instanceof Error){
+        return {error:true,message:error.message}
+     
+    }
+  }
+}
+     
+
+export const publishCourse = async (id:string)=>{
+  try {
+     await connectDB()
+     const course = await Course.findById(id).populate('lecture')
+      if(!course){
+        throw new Error("course not found")
+      }
+       if(course.title==="" || !course.title ){
+        throw new Error(" title not filed ")
+      }
+       if(course.subtitle==="" || !course.subtitle ){
+        throw new Error(" subtitle not filed ")
+      }
+       if(course.description==="" || !course.description ){
+        throw new Error(" description not filed ")
+      }
+       if(course.courseLevel==="" || !course.courseLevel ){
+        throw new Error(" courseLevel not filed ")
+      }
+       if(course.category==="" || !course.category ){
+        throw new Error(" category not filed ")
+      }
+       if(course.price==="" || !course.price ){
+        throw new Error(" price not filed ")
+      }
+       if(course.thumbnail==="" || !course.thumbnail ){
+        throw new Error(" thumbnail not filed ")
+      }
+       if(course.lecture.length===0){
+        throw new Error(" no lecture found create one ")
+      }
+       course.lecture.forEach((curr:{videoUrl:string},index:number)=>{
+          if(!curr.videoUrl || curr.videoUrl===""){
+            throw new Error(` video is required in lecture ${index+1} `)
+          }
+       })
+       course.isPublished=!course.isPublished
+       await course.save()
+       return {success:true}
+
+  } catch (error) {
+    if(error instanceof Error){
+      return {error:true,message:error.message}
+    }
+  }
+}
+
