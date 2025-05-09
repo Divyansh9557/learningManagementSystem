@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
+import { User } from './User';
 
 export interface ICourse extends Document {
     _id: string;
@@ -9,10 +10,7 @@ export interface ICourse extends Document {
     enrolledStudents: string[];
     createdAt: Date;
     updatedAt: Date;
-    creator:{
-        image:string,
-        username:string,
-    };
+    creator:User
     lecture:string[]
     category:string;
     price:number;

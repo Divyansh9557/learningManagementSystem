@@ -2,7 +2,6 @@
 
 import { getUser, updateUserName } from '@/actions/user.action'
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import Course from '@/components/home/Course'
 import {ImageUploader} from '@/components/imageUploader'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -135,10 +134,10 @@ export const ProfilePage = () => {
     <div>
       <h1 className="font-medium text-lg">Courses you&apos;re enrolled in</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 my-5">
-        {course.length === 0 ? (
+        {course?.length === 0 ? (
           <h1>You haven&apos;t enrolled yet</h1>
-        ) : (
-          course.map((course) => <Course key={course} />)
+        ) : (""
+          // course.map((course) => <Course key={course._id} curr={course} />)
         )}
       </div>
     </div>

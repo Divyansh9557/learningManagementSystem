@@ -30,7 +30,7 @@ const userSchema:Schema<User>= new mongoose.Schema({
     },
     role: {
      type: String,
-     enum: ['instructor', 'student'],
+     enum: ['admin', 'student'],
      default: 'student',
     },
     enrolledCourses:[

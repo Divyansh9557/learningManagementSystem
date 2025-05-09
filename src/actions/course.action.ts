@@ -5,8 +5,9 @@ import auth from "@/lib/checkAuth"
 import connectDB from "@/lib/connectDB";
 import deleteOnCloudinary from "@/lib/deleteOnCloudinary";
 import uploadOnClodinary from "@/lib/uploadOnCloudinary";
-import Course from "@/models/Course";
+import Course, { ICourse } from "@/models/Course";
 import Lecture from "@/models/lecture";
+import UserModel, { User } from "@/models/User";
 
 export const createCourse= async(formData:FormData)=>{
     const title = formData.get('title') as string
@@ -291,5 +292,82 @@ export const publishCourse = async (id:string)=>{
       return {error:true,message:error.message}
     }
   }
+}
+
+
+export const getCourseById = async (id: string) => {
+  try {
+    await connectDB();
+
+    const authUser = await auth();
+    const userId = authUser?.id as string;
+
+    if (!userId) {
+      throw new Error("User not authenticated");
+    }
+
+    const user: User = await UserModel.findById(userId).populate({
+      path: "enrolledCourses",
+    });
+
+    const course = await Course.findById(id)
+      .populate("creator")
+      .populate({ path: "lecture" })
+     
+
+    if (!course) {
+      throw new Error("Course not found");
+    }
+
+    const isEnrolled = user.enrolledCourses.some((enrolledCourse: any) => {
+      return (enrolledCourse as { _id: string })._id.toString() === course._id.toString();
+    });
+
+    if (isEnrolled && course && 'lecture' in course && Array.isArray(course.lecture)) {
+      course.lecture = course.lecture.map((curr: any) => ({
+        ...curr,
+        isPriviewFree: true,
+      }));
+    }
+
+    const safeCourse = JSON.parse(JSON.stringify(course));
+
+    return {
+      course: safeCourse,
+      isEnrolled,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      return { error: true, message: error.message };
+    }
+  }
+};
+
+
+export const purchasedCourse = async()=>{
+   const user= await auth();
+   console.log(user)
+   try {
+    const userData = await UserModel.findById(user?.id as string).select("-password")
+      .populate({ path: "enrolledCourses",populate: {path:"creator"} })
+      .lean() as { enrolledCourses: any[] } | null;
+
+const sanitizedCourses = userData?.enrolledCourses?.map(course => ({
+  ...course,
+  _id: course._id.toString(),
+  creator: {
+    ...course.creator,
+    _id: course.creator._id.toString(),
+  },
+  lecture: course.lecture.map((lec: { _id: string }) => ({
+    ...lec,
+    _id: lec._id.toString(),
+  })),
+}));
+
+    return sanitizedCourses || [];
+   } catch (error) {
+     console.log(error)
+   }
 }
 

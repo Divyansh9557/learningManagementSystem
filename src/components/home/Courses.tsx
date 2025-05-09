@@ -15,8 +15,7 @@ const Courses = () => {
       queryFn:async()=>{
         const res= await fetch("/api/course/published")
         const data= await res.json();
-        console.log(data.course)
-        return data.course
+        return data.course || []
       }
     })
   return (
