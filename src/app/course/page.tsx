@@ -81,7 +81,7 @@ export default function CourseFilterPageUI() {
     mutate();
   };
 
-  const handleCategory = (e: boolean, val: string) => {
+  const handleCategory = (e: boolean | string , val: string) => {
     if (e) setCategory((prev) => [...prev, val]);
     else setCategory((prev) => prev.filter((c) => c !== val));
   };
