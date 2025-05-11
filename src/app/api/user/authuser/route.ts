@@ -14,8 +14,9 @@ export async function GET() {
         const userId = jwt.verify(token, process.env.JWT_SECRET as string);
         if (typeof userId === "object" && userId !== null && "id" in userId) {
             const user = await UserModel.findById(userId.id );
+            let res;
         if (typeof user === "object" && user !== null && "id" in user && "role" in user) {
-            const res= {
+             res= {
                 id:user._id.toString(), 
                 role:user.role.toString() ,
                 image:user.image.toString(),
