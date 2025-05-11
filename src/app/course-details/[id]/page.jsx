@@ -2,7 +2,7 @@
 
 import CourseDetailss from './courseDetails';
 
-const CourseDetails = async ({ params }: { params: { id: string } }) => {
+const CourseDetails = async ({ params }) => {
   const { id } = params;
 
   return (
