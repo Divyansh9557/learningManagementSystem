@@ -179,7 +179,7 @@ const {mutate:handlePublishCourse,isPending:isPublishing}= useMutation({
 
           <Button className="bg-red-400 text-white" >
           <Dialog >
-  <DialogTrigger  >Open</DialogTrigger>
+  <DialogTrigger  >Delete</DialogTrigger>
   <DialogContent>
     <DialogHeader>
       <DialogTitle>Are you absolutely sure?</DialogTitle>
