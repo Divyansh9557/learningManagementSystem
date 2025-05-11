@@ -3,7 +3,7 @@
 import CourseDetailss from './courseDetails';
 
 const CourseDetails = async ({ params }) => {
-  const { id } = params;
+  const id = params?.id;
 
   return (
     <>
