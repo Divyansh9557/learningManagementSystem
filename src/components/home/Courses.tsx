@@ -25,7 +25,7 @@ const Courses = () => {
              <div className=' grid  grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mt-8 justify-center items-center gap-8 min-h-40' >
                 {
                     isLoading?  arr.map((curr,index)=><CourseSkeleton key={index} /> )
-                    : data?.map((curr:ICourse,index:number) =><Course curr={curr} key={curr?._id || index } /> ) 
+                    : data?.map((curr:ICourse,index:number) =><Course  curr={curr} key={curr?._id || index } /> ) 
                 }
              </div>
         

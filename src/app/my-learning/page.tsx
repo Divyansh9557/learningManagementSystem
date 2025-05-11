@@ -10,7 +10,7 @@ const MyLearning = () => {
 
         <div className="grid grid-cols-1 ml-5 md:ml-0 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           <BuyedCourse />
-          {/* Add multiple <BuyedCourse /> components here if needed */}
+         
         </div>
       </div>
     </div>

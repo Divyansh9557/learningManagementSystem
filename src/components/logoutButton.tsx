@@ -5,12 +5,15 @@ import { Button } from "./ui/button"
 
 import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 
 const LogoutButton = () => {
+  const [isLoading,setIsLoading]= useState(false)
   const queryClient = useQueryClient()
 
-   const handleLogout = async () => {  
+   const handleLogout = async () => { 
+     setIsLoading(true) 
       const res= await fetch("/api/user/logout")
       const data= await res.json()
       if(data.message==="Logout Success"){
@@ -20,11 +23,14 @@ const LogoutButton = () => {
         setTimeout(() => {
           redirect("/");
         }, 100); 
+        setIsLoading(false)
       }
    }
    
   return (
-    <Button variant='form'  onClick={handleLogout} >LogOut</Button>
+    <Button variant='form' disabled={isLoading}  onClick={handleLogout} >
+      {isLoading?"Logging out":"Log out"}
+    </Button>
   )
 }
 

@@ -111,4 +111,18 @@ export const verifyPaymentStatus= async({session_id,userId,courseId}:{session_id
      }
    }
 }
+
+export const getPurchasedCourse= async()=>{
+   try {
+    await connectDB()
+    const course= await PurchaseCourse.find({status:"Successful"}).lean()
+    const sum = course.reduce((acc, curr) => acc + curr.price, 0);
+
+   return JSON.parse(JSON.stringify({course,sum}))
+
+
+   } catch (error) {
+     console.log(error)
+   }
+}
      

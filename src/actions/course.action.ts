@@ -346,28 +346,52 @@ export const getCourseById = async (id: string) => {
 
 export const purchasedCourse = async()=>{
    const user= await auth();
-   console.log(user)
    try {
     const userData = await UserModel.findById(user?.id as string).select("-password")
       .populate({ path: "enrolledCourses",populate: {path:"creator"} })
       .lean() as { enrolledCourses: any[] } | null;
 
-const sanitizedCourses = userData?.enrolledCourses?.map(course => ({
-  ...course,
-  _id: course._id.toString(),
-  creator: {
-    ...course.creator,
-    _id: course.creator._id.toString(),
-  },
-  lecture: course.lecture.map((lec: { _id: string }) => ({
-    ...lec,
-    _id: lec._id.toString(),
-  })),
-}));
+    
 
-    return sanitizedCourses || [];
+    return JSON.parse(JSON.stringify(userData?.enrolledCourses))  || [];
    } catch (error) {
      console.log(error)
    }
 }
 
+
+export async function fetchCourses({
+  search,
+  order,
+  category,
+}: {
+  search?: string
+  order?: string
+  category?: string[]
+}) {
+  await connectDB()
+
+  const query: any = {
+    isPublished: true, // always filter only published courses
+  }
+
+  if (search) {
+    const regex = new RegExp(search, 'i') // case-insensitive
+    query.$or = [
+      { title: regex },
+      { subtitle: regex },
+    ]
+  }
+
+  if (category && category.length > 0) {
+    query.category = { $in: category }
+  }
+
+  let sortOption = {}
+  if (order === 'increasing') sortOption = { title: 1 }
+  if (order === 'decreasing') sortOption = { title: -1 }
+
+  const courses = await Course.find(query).populate('creator').sort(sortOption).lean()
+
+  return JSON.parse(JSON.stringify(courses))
+}

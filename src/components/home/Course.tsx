@@ -8,52 +8,46 @@ import Link from "next/link";
 import React from "react";
 
 const Course = ({ curr }: { curr: ICourse }) => {
-  // Split the title into words, take the first 5 words, and join them back into a string
- 
-  
-
   return (
     <Link href={`/course-details/${curr._id}`} className="block">
-      <Card className="overflow-hidden rounded-2xl  bg-white shadow-md hover:shadow-xl w-[300px] transition-transform duration-300 hover:scale-[1.02] max-h-[380px]">
-        <div className="relative w-full">
-          <div className="w-full h-40">  {/* Set fixed height for the image container */}
-            <Image
-              src={curr?.thumbnail}
-              alt={curr?.title}
-              layout="fill"
-              className="object-cover rounded-t-2xl"
-              priority
-            />
-          </div>
+      <Card className="overflow-hidden rounded-2xl  bg-gradient-to-br from-white via-gray-50 to-white shadow-lg hover:shadow-2xl w-[300px] transition-all duration-300 hover:scale-[1.03] max-h-[400px] border border-gray-100">
+        <div className="relative h-40 w-full">
+          <Image
+            src={curr?.thumbnail}
+            alt={curr?.title}
+            layout="fill"
+            className="object-cover rounded-t-2xl"
+            priority
+          />
         </div>
 
-        <CardContent className="p-4 space-y-4 flex flex-col justify-between">
-          <h1 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 hover:underline line-clamp-2">
-            {curr?.title} {/* Display the limited title with ellipsis */}
+        <CardContent className="p-4 flex flex-col justify-between h-[240px]">
+          <h1 className="text-lg md:text-xl font-semibold text-gray-800 hover:underline line-clamp-2">
+            {curr?.title}
           </h1>
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-3">
             <div className="flex items-center gap-2">
-              <Avatar className="h-8 w-8">
+              <Avatar className="h-9 w-9 border">
                 <AvatarImage
                   src={curr?.creator?.image}
                   alt={curr?.creator?.username}
                 />
-                <AvatarFallback className="bg-gray-900 text-white text-xs">
+                <AvatarFallback className="bg-gray-800 text-white text-xs">
                   CN
                 </AvatarFallback>
               </Avatar>
-              <span className="text-sm text-gray-700 font-medium">
+              <span className="text-sm text-gray-600 font-medium">
                 {curr?.creator?.username || "Unknown"}
               </span>
             </div>
 
-            <Badge className="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">
+            <Badge className="bg-blue-600/90 text-white text-[10px] px-3 py-1 rounded-full uppercase tracking-wide">
               {curr?.courseLevel}
             </Badge>
           </div>
 
-          <div className="text-lg font-bold text-gray-900">
+          <div className="text-right mt-auto text-xl font-bold text-blue-700">
             ₹{curr?.price}
           </div>
         </CardContent>
