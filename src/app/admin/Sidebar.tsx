@@ -15,7 +15,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-full min-h-[90.5vh] md:w-64 bg-gray-900 text-white p-4 md:p-6">
+    <div className="w-full md:min-h-[90.5vh] md:w-64 bg-gray-900 text-white p-4 md:p-6">
       {/* Mobile toggle button */}
       <div className="md:hidden flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold text-blue-400">Admin Panel</h2>

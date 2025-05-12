@@ -29,5 +29,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/course-progress/:path*','/course-progress/:path*'], // Routes to protect
+  matcher: ['/admin/:path*', '/course-progress/:path*','/course-details/:path*'], // Routes to protect
 };
